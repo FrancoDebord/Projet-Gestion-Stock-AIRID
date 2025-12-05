@@ -13,6 +13,7 @@ class StockArrivalAdministration extends Model
 
     protected $fillable = [
         'date_arrival', 'sender', 'description_globale', 'stock_location_destination', 'administration_staff',
+        'bordereau_delivery', 'certificate_analysis', 'msds', 'other_document', 'staff_transmis_stock',
     ];
 
     protected $casts = [
@@ -27,6 +28,11 @@ class StockArrivalAdministration extends Model
     public function administrationStaff()
     {
         return $this->belongsTo(User::class, 'administration_staff');
+    }
+
+    public function transmittedTo()
+    {
+        return $this->belongsTo(User::class, 'staff_transmis_stock');
     }
 
     public function incomingRecords()

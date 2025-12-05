@@ -41,6 +41,14 @@ class RolePermissionSeeder extends Seeder
             
             // Settings permissions
             'manage_settings' => 'Manage system settings',
+            // Arrival management
+            'manage_arrivals' => 'Manage stock arrivals (administration reception)',
+
+            // Stock reception permissions
+            'view_stock_receptions' => 'View stock receptions',
+            'create_stock_receptions' => 'Create stock receptions',
+            'edit_stock_receptions' => 'Edit stock receptions',
+            'delete_stock_receptions' => 'Delete stock receptions',
         ];
 
         foreach ($permissions as $name => $description) {
@@ -88,6 +96,11 @@ class RolePermissionSeeder extends Seeder
             'assign_roles',
             'view_reports',
             'export_reports',
+            'manage_arrivals',
+            'view_stock_receptions',
+            'create_stock_receptions',
+            'edit_stock_receptions',
+            'delete_stock_receptions',
         ])->pluck('id');
         $manager->permissions()->sync($managerPermissions);
 
@@ -98,6 +111,8 @@ class RolePermissionSeeder extends Seeder
             'record_stock_out',
             'view_movements',
             'view_stock_low',
+            'view_stock_receptions',
+            'create_stock_receptions',
         ])->pluck('id');
         $operator->permissions()->sync($operatorPermissions);
 
@@ -106,6 +121,7 @@ class RolePermissionSeeder extends Seeder
             'view_stock',
             'view_movements',
             'view_reports',
+            'view_stock_receptions',
         ])->pluck('id');
         $viewer->permissions()->sync($viewerPermissions);
     }

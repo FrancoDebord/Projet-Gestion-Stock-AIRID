@@ -9,7 +9,7 @@
             $buttons = [
                 ['label' => 'Stock Locations', 'route' => 'stock-locations.index', 'icon' => 'fa-warehouse', 'color' => 'primary', 'permission' => 'view_stock'],
                 ['label' => 'Stock Items Management', 'route' => 'stock-items.index', 'icon' => 'fa-boxes-stacked', 'color' => 'success', 'permission' => 'view_stock'],
-                ['label' => 'Shipment Reception', 'route' => 'shipment.reception', 'icon' => 'fa-truck-loading', 'color' => 'warning', 'permission' => 'record_stock_in'],
+                ['label' => 'Shipment Reception', 'route' => 'stock-arrivals-admin.index', 'icon' => 'fa-truck-loading', 'color' => 'warning', 'permission' => 'record_stock_in'],
                 ['label' => 'Stock Reception', 'route' => 'stock.reception', 'icon' => 'fa-box-open', 'color' => 'info', 'permission' => 'record_stock_in'],
                 ['label' => 'Stock Movements', 'route' => 'stock.movements', 'icon' => 'fa-exchange-alt', 'color' => 'secondary', 'permission' => 'view_movements'],
                 ['label' => 'Statistics', 'route' => 'statistics', 'icon' => 'fa-chart-line', 'color' => 'dark', 'permission' => 'view_reports'],

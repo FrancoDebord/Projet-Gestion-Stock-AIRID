@@ -70,6 +70,7 @@ Route::middleware('auth')->prefix('users')->group(function () {
 // Stock locations CRUD
 use App\Http\Controllers\StockLocationController;
 use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\StockArrivalAdministrationController;
 
 Route::middleware('auth')->prefix('stock-locations')->group(function () {
     Route::get('/', [StockLocationController::class, 'index'])->name('stock-locations.index');
@@ -104,6 +105,32 @@ Route::middleware('auth')->prefix('product-categories')->group(function () {
     Route::get('/{productCategory}/edit', [ProductCategoryController::class, 'edit'])->name('product-categories.edit');
     Route::patch('/{productCategory}', [ProductCategoryController::class, 'update'])->name('product-categories.update');
     Route::delete('/{productCategory}', [ProductCategoryController::class, 'destroy'])->name('product-categories.destroy');
+});
+
+// Stock arrival administration CRUD
+Route::middleware('auth')->prefix('stock-arrivals-admin')->group(function () {
+    Route::get('/', [StockArrivalAdministrationController::class, 'index'])->name('stock-arrivals-admin.index');
+    Route::get('/create', [StockArrivalAdministrationController::class, 'create'])->name('stock-arrivals-admin.create');
+    Route::post('/', [StockArrivalAdministrationController::class, 'store'])->name('stock-arrivals-admin.store');
+    Route::get('/{stockArrivalAdministration}', [StockArrivalAdministrationController::class, 'show'])->name('stock-arrivals-admin.show');
+    Route::get('/{stockArrivalAdministration}/edit', [StockArrivalAdministrationController::class, 'edit'])->name('stock-arrivals-admin.edit');
+    Route::patch('/{stockArrivalAdministration}', [StockArrivalAdministrationController::class, 'update'])->name('stock-arrivals-admin.update');
+    Route::delete('/{stockArrivalAdministration}', [StockArrivalAdministrationController::class, 'destroy'])->name('stock-arrivals-admin.destroy');
+    Route::get('/{stockArrivalAdministration}/pdf', [StockArrivalAdministrationController::class, 'pdf'])->name('stock-arrivals-admin.pdf');
+});
+
+// Stock receptions CRUD
+use App\Http\Controllers\StockReceptionController;
+
+Route::middleware('auth')->prefix('stock-receptions')->group(function () {
+    Route::get('/', [StockReceptionController::class, 'index'])->name('stock-receptions.index');
+    Route::get('/create', [StockReceptionController::class, 'create'])->name('stock-receptions.create');
+    Route::post('/', [StockReceptionController::class, 'store'])->name('stock-receptions.store');
+    Route::get('/{stockReception}', [StockReceptionController::class, 'show'])->name('stock-receptions.show');
+    Route::get('/{stockReception}/edit', [StockReceptionController::class, 'edit'])->name('stock-receptions.edit');
+    Route::patch('/{stockReception}', [StockReceptionController::class, 'update'])->name('stock-receptions.update');
+    Route::delete('/{stockReception}', [StockReceptionController::class, 'destroy'])->name('stock-receptions.destroy');
+    Route::get('/{stockReception}/pdf', [StockReceptionController::class, 'pdf'])->name('stock-receptions.pdf');
 });
 
 require __DIR__.'/auth.php';
