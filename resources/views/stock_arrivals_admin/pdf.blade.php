@@ -196,7 +196,7 @@
     <!-- Header -->
     <div class="header">
         <div class="logo-left">
-            <img src="{{ asset('storage/assets/logo/airid1.jpg') }}" alt="AIRID Logo" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="{{ storage_path('app/public/assets/logo/airid1.jpg') }}" alt="AIRID Logo" style="width: 100%; height: 100%; object-fit: contain;">
         </div>
 
         <div class="lab-info">

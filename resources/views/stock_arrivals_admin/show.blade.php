@@ -8,8 +8,12 @@
             <a href="{{ route('stock-arrivals-admin.pdf', $stockArrivalAdministration) }}" class="btn btn-outline-info">Télécharger PDF</a>
             @if($stockArrivalAdministration->incomingRecords->count() == 0)
                 <a href="{{ route('stock-arrivals-admin.edit', $stockArrivalAdministration) }}" class="btn btn-outline-warning">Éditer</a>
+                <form action="{{ route('stock-arrivals-admin.destroy', $stockArrivalAdministration) }}" method="POST" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
+                    @csrf @method('DELETE')
+                    <button class="btn btn-outline-danger">Supprimer</button>
+                </form>
             @else
-                <span class="btn btn-outline-success disabled" title="Réception stock effectuée - Modification impossible">Stock Reçu</span>
+                <span class="btn btn-outline-success disabled" title="Réception stock effectuée - Modification/Suppression impossible">Stock Reçu</span>
             @endif
         </div>
     </div>

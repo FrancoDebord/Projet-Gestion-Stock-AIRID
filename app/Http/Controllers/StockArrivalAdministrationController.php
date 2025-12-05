@@ -71,6 +71,12 @@ class StockArrivalAdministrationController extends Controller
     {
         $this->authorize('update', $stockArrivalAdministration);
 
+        // Check if stock reception already exists
+        if ($stockArrivalAdministration->incomingRecords()->exists()) {
+            return redirect()->route('stock-arrivals-admin.show', $stockArrivalAdministration)
+                ->with('error', 'Impossible de modifier cette réception car le stock a déjà été réceptionné.');
+        }
+
         $locations = StockLocation::orderBy('stock_name')->get();
         $users = User::orderBy('name')->get();
 
@@ -80,6 +86,12 @@ class StockArrivalAdministrationController extends Controller
     public function update(Request $request, StockArrivalAdministration $stockArrivalAdministration)
     {
         $this->authorize('update', $stockArrivalAdministration);
+
+        // Check if stock reception already exists
+        if ($stockArrivalAdministration->incomingRecords()->exists()) {
+            return redirect()->route('stock-arrivals-admin.show', $stockArrivalAdministration)
+                ->with('error', 'Impossible de modifier cette réception car le stock a déjà été réceptionné.');
+        }
 
         $data = $request->validate([
             'date_arrival' => 'required|date',
@@ -113,6 +125,12 @@ class StockArrivalAdministrationController extends Controller
     public function destroy(StockArrivalAdministration $stockArrivalAdministration)
     {
         $this->authorize('delete', $stockArrivalAdministration);
+
+        // Check if stock reception already exists
+        if ($stockArrivalAdministration->incomingRecords()->exists()) {
+            return redirect()->route('stock-arrivals-admin.show', $stockArrivalAdministration)
+                ->with('error', 'Impossible de supprimer cette réception car le stock a déjà été réceptionné.');
+        }
 
         // delete files
         foreach (['bordereau_delivery','certificate_analysis','msds','other_document'] as $f) {

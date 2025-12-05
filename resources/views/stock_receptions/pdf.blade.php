@@ -214,7 +214,7 @@
     <!-- Header -->
     <div class="header">
         <div class="logo-left">
-            <img src="{{ asset('storage/assets/logo/airid1.jpg') }}" alt="AIRID Logo" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="{{ storage_path('app/public/assets/logo/airid1.jpg') }}" alt="AIRID Logo" style="width: 100%; height: 100%; object-fit: contain;">
         </div>
 
         <div class="lab-info">
@@ -227,7 +227,7 @@
         </div>
 
         <div class="logo-right">
-            <img src="{{ asset('storage/assets/logo/airid1.jpg') }}" alt="AIRID Logo" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="{{ storage_path('app/public/assets/logo/airid1.jpg') }}" alt="AIRID Logo" style="width: 100%; height: 100%; object-fit: contain;">
         </div>
     </div>
 
@@ -270,6 +270,11 @@
                 <td class="info-value">{{ now()->format('d/m/Y H:i') }}</td>
             </tr>
         </table>
+
+        <div style="margin-top: 15px; padding: 10px; background-color: #e3f2fd; border: 1px solid #2196f3; border-radius: 4px;">
+            <strong>Note:</strong> This stock reception is linked to Administrative Shipment Report #{{ $stockReception->stockArrivalAdministration->id }}.
+            For complete shipment documentation, refer to the original shipment reception report.
+        </div>
     </div>
 
     <!-- Description -->
