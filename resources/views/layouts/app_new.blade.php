@@ -102,7 +102,7 @@
           <li class="nav-item"><a class="nav-link" href="{{ route('stock-items.index') }}">Items</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ route('stock-arrivals-admin.index') }}">Réception Livraison</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ route('stock-receptions.index') }}">Réception Stock</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ route('stock.movements') }}">Mouvements</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ route('movements.index') }}">Mouvements</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ route('statistics') }}">Statistiques</a></li>
         </ul>
         <ul class="navbar-nav ms-auto">

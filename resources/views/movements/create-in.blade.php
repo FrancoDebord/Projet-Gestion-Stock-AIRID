@@ -1,56 +1,86 @@
-@extends('layouts.app')
+@extends('layouts.app_new')
 
 @section('content')
-<div class="py-12">
-    <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900">
-                <h2 class="text-2xl font-bold mb-6">Record Stock Incoming</h2>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h4 mb-0">Record Stock Incoming</h1>
+                <a href="{{ route('movements.index') }}" class="btn btn-light">Back</a>
+            </div>
 
-                <form action="{{ route('movements.store-in') }}" method="POST" class="space-y-6">
+            <div class="card shadow-sm p-3">
+                <form action="{{ route('movements.store-in') }}" method="POST">
                     @csrf
 
-                    <div>
-                        <label for="stock_item_id" class="block text-sm font-medium text-gray-700">Stock Item *</label>
-                        <select id="stock_item_id" name="stock_item_id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
-                            <option value="">-- Select Stock Item --</option>
+                    <div class="mb-3">
+                        <label class="form-label">Stock Item *</label>
+                        <select name="stock_item_id" required class="form-select @error('stock_item_id') is-invalid @enderror">
+                            <option value="">— Select —</option>
                             @foreach($stocks as $stock)
-                                <option value="{{ $stock->id }}" @if(request('stock_item_id') == $stock->id) selected @endif>
-                                    {{ $stock->sku }} - {{ $stock->name }}
-                                </option>
+                                <option value="{{ $stock->id }}" @if(old('stock_item_id') == $stock->id) selected @endif>{{ $stock->sku }} — {{ $stock->name }}</option>
                             @endforeach
                         </select>
-                        @error('stock_item_id')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        @error('stock_item_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
-                    <div>
-                        <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity *</label>
-                        <input type="number" id="quantity" name="quantity" required min="1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" value="{{ old('quantity') }}">
-                        @error('quantity')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Quantity *</label>
+                            <input type="number" name="quantity" min="1" required class="form-control @error('quantity') is-invalid @enderror" value="{{ old('quantity') }}">
+                            @error('quantity')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Movement Date</label>
+                            <input type="datetime-local" name="date_mouvement" class="form-control @error('date_mouvement') is-invalid @enderror" value="{{ old('date_mouvement') }}">
+                            @error('date_mouvement')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="reason" class="block text-sm font-medium text-gray-700">Reason</label>
-                        <input type="text" id="reason" name="reason" placeholder="e.g., Purchase Order, Donation" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" value="{{ old('reason') }}">
+                    <div class="row g-3 mt-0">
+                        <div class="col-md-6">
+                            <label class="form-label">Reason</label>
+                            <input type="text" name="reason" class="form-control" value="{{ old('reason') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference</label>
+                            <input type="text" name="reference" class="form-control" value="{{ old('reference') }}">
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="reference" class="block text-sm font-medium text-gray-700">Reference Number</label>
-                        <input type="text" id="reference" name="reference" placeholder="e.g., PO-12345, INV-789" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" value="{{ old('reference') }}">
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Notes</label>
+                        <textarea name="notes" class="form-control" rows="3">{{ old('notes') }}</textarea>
                     </div>
 
-                    <div>
-                        <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
-                        <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">{{ old('notes') }}</textarea>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Batch number</label>
+                            <input type="text" name="batch_number" class="form-control" value="{{ old('batch_number') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reception Detail</label>
+                            <select name="stock_incoming_detail_id" class="form-select @error('stock_incoming_detail_id') is-invalid @enderror">
+                                <option value="">— Select —</option>
+                                @foreach($incomingDetails as $detail)
+                                    <option value="{{ $detail->id }}" @if(old('stock_incoming_detail_id') == $detail->id) selected @endif>
+                                        #{{ $detail->id }} — Lot: {{ $detail->code_lot }} — Qty: {{ $detail->quantite_lot }} — Item: {{ $detail->stockItem->name ?? 'N/A' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('stock_incoming_detail_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
                     </div>
 
-                    <div class="flex justify-end space-x-3">
-                        <a href="{{ route('movements.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
-                        <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700">Record Incoming</button>
+                    <div class="row g-3 mt-0">
+                        <div class="col-md-6">
+                            <label class="form-label">Usage Request (not applicable for incoming)</label>
+                            <input type="number" name="stock_item_usage_request_id" class="form-control" value="" disabled>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-3">
+                        <button class="btn btn-success">Record Incoming</button>
                     </div>
                 </form>
             </div>

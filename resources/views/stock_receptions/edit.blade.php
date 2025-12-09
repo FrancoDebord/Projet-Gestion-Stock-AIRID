@@ -43,7 +43,7 @@
                             <select name="receiver" class="form-select @error('receiver') is-invalid @enderror" required>
                                 <option value="">— Sélectionner —</option>
                                 @foreach($users as $user)
-                                    <option value="{{ $user->id }}" @if(old('receiver', $stockReception->receiver_id) == $user->id) selected @endif>{{ $user->name }}</option>
+                                    <option value="{{ $user->id }}" @if(old('receiver', $stockReception->receiver) == $user->id) selected @endif>{{ $user->name }}</option>
                                 @endforeach
                             </select>
                             @error('receiver')<div class="invalid-feedback">{{ $message }}</div>@enderror

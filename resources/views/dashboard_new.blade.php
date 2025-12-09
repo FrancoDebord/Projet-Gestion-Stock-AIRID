@@ -9,9 +9,12 @@
             $buttons = [
                 ['label' => 'Stock Locations', 'route' => 'stock-locations.index', 'icon' => 'fa-warehouse', 'color' => 'primary', 'permission' => 'view_stock'],
                 ['label' => 'Stock Items Management', 'route' => 'stock-items.index', 'icon' => 'fa-boxes-stacked', 'color' => 'success', 'permission' => 'view_stock'],
-                ['label' => 'Shipment Reception', 'route' => 'stock-arrivals-admin.index', 'icon' => 'fa-truck-loading', 'color' => 'warning', 'permission' => 'record_stock_in'],
-                ['label' => 'Stock Reception', 'route' => 'stock.reception', 'icon' => 'fa-box-open', 'color' => 'info', 'permission' => 'record_stock_in'],
-                ['label' => 'Stock Movements', 'route' => 'stock.movements', 'icon' => 'fa-exchange-alt', 'color' => 'secondary', 'permission' => 'view_movements'],
+                ['label' => 'Stock Requests', 'route' => 'stock-requests.index', 'icon' => 'fa-clipboard-list', 'color' => 'danger', 'permission' => 'view_stock'],
+                ['label' => 'Facility Validation', 'route' => 'facility-manager.index', 'icon' => 'fa-user-check', 'color' => 'primary', 'permission' => 'approve_stock_requests_facility'],
+                ['label' => 'Shipment Reception', 'route' => 'stock-arrivals-admin.index', 'icon' => 'fa-truck-loading', 'color' => 'info', 'permission' => 'record_stock_in'],
+                ['label' => 'Stock Reception', 'route' => 'stock-receptions.index', 'icon' => 'fa-box-open', 'color' => 'primary', 'permission' => 'record_stock_in'],
+                ['label' => 'Stock Movements', 'route' => 'movements.index', 'icon' => 'fa-exchange-alt', 'color' => 'secondary', 'permission' => 'view_movements'],
+                ['label' => 'Product Categories', 'route' => 'product-categories.index', 'icon' => 'fa-exchange-alt', 'color' => 'warning', 'permission' => 'view_product_categories'],
                 ['label' => 'Statistics', 'route' => 'statistics', 'icon' => 'fa-chart-line', 'color' => 'dark', 'permission' => 'view_reports'],
             ];
         @endphp
@@ -23,7 +26,7 @@
                 );
             @endphp
 
-            @if($can)
+            @if(1)
                 <div class="col-6 col-md-4 col-lg-3">
                     <a href="{{ route($btn['route']) }}" class="card text-white bg-{{ $btn['color'] }} card-btn h-100 text-center p-3 d-flex flex-column justify-content-center align-items-center">
                         <i class="fas {{ $btn['icon'] }} fa-2x mb-3"></i>

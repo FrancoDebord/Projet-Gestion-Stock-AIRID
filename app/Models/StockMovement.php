@@ -20,11 +20,16 @@ class StockMovement extends Model
         'project_id',
         'purpose',
         'usage_form_path',
+        'batch_number',
+        'stock_incoming_detail_id',
+        'date_mouvement',
+        'stock_item_usage_request_id',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'date_mouvement' => 'datetime',
     ];
 
     public function stockItem()
@@ -40,6 +45,16 @@ class StockMovement extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function incomingDetail()
+    {
+        return $this->belongsTo(StockIncomingRecordDetail::class, 'stock_incoming_detail_id');
+    }
+
+    public function usageRequest()
+    {
+        return $this->belongsTo(StockRequest::class, 'stock_item_usage_request_id');
     }
 
     public function getQuantityChangeAttribute()

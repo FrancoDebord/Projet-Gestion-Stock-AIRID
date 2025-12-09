@@ -6,7 +6,12 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 
 use App\Models\StockArrivalAdministration;
+use App\Models\StockIncomingRecord;
+use App\Models\StockRequest;
 use App\Policies\StockArrivalAdministrationPolicy;
+use App\Policies\StockIncomingRecordPolicy;
+use App\Policies\StockRequestPolicy;
+use App\Policies\FacilityManagerPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -17,6 +22,9 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         StockArrivalAdministration::class => StockArrivalAdministrationPolicy::class,
+        StockIncomingRecord::class => StockIncomingRecordPolicy::class,
+        StockRequest::class => StockRequestPolicy::class,
+        StockRequest::class => FacilityManagerPolicy::class, // For facility manager actions
     ];
 
     /**

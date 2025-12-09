@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\StockItem;
 use App\Models\StockMovement;
 use App\Models\ActivityLog;
+use App\Models\StockIncomingRecordDetail;
+use App\Models\StockRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,7 +47,12 @@ class StockMovementController extends Controller
         }
 
         $stocks = StockItem::all();
-        return view('movements.create-in', compact('stocks'));
+        $incomingDetails = StockIncomingRecordDetail::leftJoin('stock_movements', 'stock_movements.stock_incoming_detail_id', '=', 'stock_incoming_record_details.id')
+            ->whereNull('stock_movements.stock_incoming_detail_id')
+            ->select('stock_incoming_record_details.*')
+            ->orderBy('id', 'desc')
+            ->get();
+        return view('movements.create-in', compact('stocks', 'incomingDetails'));
     }
 
     /**
@@ -60,7 +67,10 @@ class StockMovementController extends Controller
         }
 
         $stocks = StockItem::where('quantity', '>', 0)->get();
-        return view('movements.create-out', compact('stocks'));
+        $usageRequests = StockRequest::whereIn('status', ['approved_facility_manager', 'approved_data_manager'])
+            ->latest('request_date')
+            ->get();
+        return view('movements.create-out', compact('stocks', 'usageRequests'));
     }
 
     /**
@@ -95,6 +105,10 @@ class StockMovementController extends Controller
             'reason' => 'nullable|string',
             'notes' => 'nullable|string',
             'reference' => 'nullable|string|max:255',
+            'batch_number' => 'nullable|string|max:100',
+            'stock_incoming_detail_id' => 'nullable|exists:stock_incoming_record_details,id',
+            'date_mouvement' => 'nullable|date',
+            'stock_item_usage_request_id' => 'nullable|exists:stock_item_usage_requests,id',
         ]);
 
         $stock = StockItem::findOrFail($validated['stock_item_id']);
@@ -109,6 +123,10 @@ class StockMovementController extends Controller
             'reason' => $validated['reason'],
             'notes' => $validated['notes'],
             'reference' => $validated['reference'],
+            'batch_number' => $validated['batch_number'] ?? null,
+            'stock_incoming_detail_id' => $validated['stock_incoming_detail_id'] ?? null,
+            'date_mouvement' => $validated['date_mouvement'] ?? now(),
+            'stock_item_usage_request_id' => $validated['stock_item_usage_request_id'] ?? null,
         ]);
 
         // Update stock quantity
@@ -147,6 +165,10 @@ class StockMovementController extends Controller
             'reason' => 'nullable|string',
             'notes' => 'nullable|string',
             'reference' => 'nullable|string|max:255',
+            'batch_number' => 'nullable|string|max:100',
+            'stock_incoming_detail_id' => 'nullable|exists:stock_incoming_record_details,id',
+            'date_mouvement' => 'nullable|date',
+            'stock_item_usage_request_id' => 'nullable|exists:stock_item_usage_requests,id',
         ]);
 
         $stock = StockItem::findOrFail($validated['stock_item_id']);
@@ -166,6 +188,10 @@ class StockMovementController extends Controller
             'reason' => $validated['reason'],
             'notes' => $validated['notes'],
             'reference' => $validated['reference'],
+            'batch_number' => $validated['batch_number'] ?? null,
+            'stock_incoming_detail_id' => $validated['stock_incoming_detail_id'] ?? null,
+            'date_mouvement' => $validated['date_mouvement'] ?? now(),
+            'stock_item_usage_request_id' => $validated['stock_item_usage_request_id'] ?? null,
         ]);
 
         // Update stock quantity
@@ -203,6 +229,10 @@ class StockMovementController extends Controller
             'quantity' => 'required|integer',
             'reason' => 'required|string',
             'notes' => 'nullable|string',
+            'batch_number' => 'nullable|string|max:100',
+            'stock_incoming_detail_id' => 'nullable|exists:stock_incoming_record_details,id',
+            'date_mouvement' => 'nullable|date',
+            'stock_item_usage_request_id' => 'nullable|exists:stock_item_usage_requests,id',
         ]);
 
         $stock = StockItem::findOrFail($validated['stock_item_id']);
@@ -217,7 +247,15 @@ class StockMovementController extends Controller
             'quantity' => abs($adjustmentQuantity),
             'reason' => $validated['reason'],
             'notes' => $validated['notes'],
+            'batch_number' => $validated['batch_number'] ?? null,
+            'stock_incoming_detail_id' => $validated['stock_incoming_detail_id'] ?? null,
+            'date_mouvement' => $validated['date_mouvement'] ?? now(),
+            'stock_item_usage_request_id' => $validated['stock_item_usage_request_id'] ?? null,
         ]);
+
+        
+        
+        
 
         // Update stock quantity
         $stock->quantity += $adjustmentQuantity;
@@ -253,5 +291,103 @@ class StockMovementController extends Controller
             'causer_id' => Auth::id(),
             'properties' => $properties,
         ]);
+    }
+
+    /**
+     * Export movement to PDF or printable view.
+     */
+    public function pdf(StockMovement $movement)
+    {
+        $user = Auth::user();
+        if (!$user->hasPermission('view_movements')) {
+            abort(403);
+        }
+
+        $movement->load(['stockItem', 'user', 'incomingDetail.stockIncomingRecord', 'usageRequest.project']);
+
+        if (class_exists('\Barryvdh\DomPDF\Facades\Pdf')) {
+            $pdf = \Barryvdh\DomPDF\Facades\Pdf::loadView('movements.pdf', compact('movement'));
+            return $pdf->download('stock_movement_'.$movement->id.'.pdf');
+        }
+
+        return view('movements.pdf', compact('movement'));
+    }
+
+    /**
+     * Display a specific movement.
+     */
+    public function show(StockMovement $movement)
+    {
+        $user = Auth::user();
+        if (!$user->hasPermission('view_movements')) {
+            abort(403);
+        }
+
+        $movement->load(['stockItem', 'user', 'incomingDetail', 'usageRequest']);
+        return view('movements.show', compact('movement'));
+    }
+
+    /**
+     * Edit movement metadata.
+     */
+    public function edit(StockMovement $movement)
+    {
+        $user = Auth::user();
+        if (!$user->hasPermission('manage_settings')) {
+            abort(403);
+        }
+
+        $movement->load(['stockItem']);
+        return view('movements.edit', compact('movement'));
+    }
+
+    /**
+     * Update movement metadata.
+     */
+    public function update(Request $request, StockMovement $movement)
+    {
+        $user = Auth::user();
+        if (!$user->hasPermission('manage_settings')) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'reason' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'reference' => 'nullable|string|max:255',
+            'batch_number' => 'nullable|string|max:100',
+            'stock_incoming_detail_id' => 'nullable|exists:stock_incoming_record_details,id',
+            'date_mouvement' => 'nullable|date',
+            'stock_item_usage_request_id' => 'nullable|exists:stock_item_usage_requests,id',
+        ]);
+
+        $movement->update($validated);
+
+        return redirect()->route('movements.show', $movement)->with('success', 'Mouvement mis à jour');
+    }
+
+    /**
+     * Delete a movement (reverses stock for in/out).
+     */
+    public function destroy(StockMovement $movement)
+    {
+        $user = Auth::user();
+        if (!$user->hasPermission('manage_settings')) {
+            abort(403);
+        }
+
+        $stock = $movement->stockItem;
+
+        if ($movement->type === 'in') {
+            $stock->decrement('quantity', $movement->quantity);
+        } elseif ($movement->type === 'out') {
+            $stock->increment('quantity', $movement->quantity);
+        } else {
+            return back()->with('error', 'Suppression non autorisée pour les ajustements');
+        }
+
+        $movement->delete();
+
+        return redirect()->route('movements.index')->with('success', 'Mouvement supprimé');
     }
 }

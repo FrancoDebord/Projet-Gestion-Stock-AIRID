@@ -45,6 +45,11 @@ Route::middleware('auth')->prefix('movements')->group(function () {
     Route::post('/out', [StockMovementController::class, 'storeOut'])->name('movements.store-out');
     Route::get('/adjustment/create', [StockMovementController::class, 'createAdjustment'])->name('movements.create-adjustment');
     Route::post('/adjustment', [StockMovementController::class, 'storeAdjustment'])->name('movements.store-adjustment');
+    Route::get('/{movement}', [StockMovementController::class, 'show'])->name('movements.show');
+    Route::get('/{movement}/pdf', [StockMovementController::class, 'pdf'])->name('movements.pdf');
+    Route::get('/{movement}/edit', [StockMovementController::class, 'edit'])->name('movements.edit');
+    Route::patch('/{movement}', [StockMovementController::class, 'update'])->name('movements.update');
+    Route::delete('/{movement}', [StockMovementController::class, 'destroy'])->name('movements.destroy');
 });
 
 // Shipments: administration reception and finalization
@@ -131,6 +136,34 @@ Route::middleware('auth')->prefix('stock-receptions')->group(function () {
     Route::patch('/{stockReception}', [StockReceptionController::class, 'update'])->name('stock-receptions.update');
     Route::delete('/{stockReception}', [StockReceptionController::class, 'destroy'])->name('stock-receptions.destroy');
     Route::get('/{stockReception}/pdf', [StockReceptionController::class, 'pdf'])->name('stock-receptions.pdf');
+});
+
+// Stock requests CRUD
+use App\Http\Controllers\StockRequestController;
+
+// Facility Manager validation module
+use App\Http\Controllers\FacilityManagerController;
+
+Route::middleware('auth')->prefix('stock-requests')->group(function () {
+    Route::get('/', [StockRequestController::class, 'index'])->name('stock-requests.index');
+    Route::get('/create', [StockRequestController::class, 'create'])->name('stock-requests.create');
+    Route::post('/', [StockRequestController::class, 'store'])->name('stock-requests.store');
+    Route::get('/{stockRequest}', [StockRequestController::class, 'show'])->name('stock-requests.show');
+    Route::get('/{stockRequest}/edit', [StockRequestController::class, 'edit'])->name('stock-requests.edit');
+    Route::patch('/{stockRequest}', [StockRequestController::class, 'update'])->name('stock-requests.update');
+    Route::delete('/{stockRequest}', [StockRequestController::class, 'destroy'])->name('stock-requests.destroy');
+    Route::get('/{stockRequest}/pdf', [StockRequestController::class, 'pdf'])->name('stock-requests.pdf');
+    Route::post('/{stockRequest}/approve', [StockRequestController::class, 'approve'])->name('stock-requests.approve');
+    Route::post('/{stockRequest}/reject', [StockRequestController::class, 'reject'])->name('stock-requests.reject');
+    Route::post('/{stockRequest}/fulfill', [StockRequestController::class, 'fulfill'])->name('stock-requests.fulfill');
+});
+
+// Facility Manager validation routes
+Route::middleware('auth')->prefix('facility-manager')->group(function () {
+    Route::get('/', [FacilityManagerController::class, 'index'])->name('facility-manager.index');
+    Route::get('/requests/{stockRequest}', [FacilityManagerController::class, 'show'])->name('facility-manager.show');
+    Route::post('/requests/{stockRequest}/approve', [FacilityManagerController::class, 'approve'])->name('facility-manager.approve');
+    Route::post('/requests/{stockRequest}/reject', [FacilityManagerController::class, 'reject'])->name('facility-manager.reject');
 });
 
 require __DIR__.'/auth.php';

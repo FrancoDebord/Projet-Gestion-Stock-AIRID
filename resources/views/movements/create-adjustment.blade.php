@@ -1,62 +1,87 @@
-@extends('layouts.app')
+@extends('layouts.app_new')
 
 @section('content')
-<div class="py-12">
-    <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900">
-                <h2 class="text-2xl font-bold mb-6">Adjust Stock Quantity</h2>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h4 mb-0">Adjust Stock Quantity</h1>
+                <a href="{{ route('movements.index') }}" class="btn btn-light">Back</a>
+            </div>
 
-                <form action="{{ route('movements.store-adjustment') }}" method="POST" class="space-y-6">
+            <div class="card shadow-sm p-3">
+                <form action="{{ route('movements.store-adjustment') }}" method="POST">
                     @csrf
 
-                    <div>
-                        <label for="stock_item_id" class="block text-sm font-medium text-gray-700">Stock Item *</label>
-                        <select id="stock_item_id" name="stock_item_id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
-                            <option value="">-- Select Stock Item --</option>
+                    <div class="mb-3">
+                        <label class="form-label">Stock Item *</label>
+                        <select name="stock_item_id" required class="form-select @error('stock_item_id') is-invalid @enderror">
+                            <option value="">— Select —</option>
                             @foreach($stocks as $stock)
-                                <option value="{{ $stock->id }}" @if(request('stock_item_id') == $stock->id) selected @endif>
-                                    {{ $stock->sku }} - {{ $stock->name }} (Current: {{ $stock->quantity }})
-                                </option>
+                                <option value="{{ $stock->id }}" @if(old('stock_item_id') == $stock->id) selected @endif>{{ $stock->sku }} — {{ $stock->name }} (Current: {{ $stock->quantity }})</option>
                             @endforeach
                         </select>
-                        @error('stock_item_id')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        @error('stock_item_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
-                    <div>
-                        <label for="quantity" class="block text-sm font-medium text-gray-700">Adjustment Quantity * (+ or -)</label>
-                        <input type="number" id="quantity" name="quantity" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" value="{{ old('quantity') }}" placeholder="e.g., 5 (add) or -3 (subtract)">
-                        @error('quantity')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Adjustment Quantity *</label>
+                            <input type="number" name="quantity" required class="form-control @error('quantity') is-invalid @enderror" value="{{ old('quantity') }}" placeholder="e.g., 5 or -3">
+                            @error('quantity')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Movement Date</label>
+                            <input type="datetime-local" name="date_mouvement" class="form-control @error('date_mouvement') is-invalid @enderror" value="{{ old('date_mouvement') }}">
+                            @error('date_mouvement')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="reason" class="block text-sm font-medium text-gray-700">Reason *</label>
-                        <select id="reason" name="reason" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
-                            <option value="">-- Select Reason --</option>
-                            <option value="Inventory Count">Inventory Count</option>
-                            <option value="Damaged">Damaged</option>
-                            <option value="Loss">Loss</option>
-                            <option value="System Error">System Error</option>
-                            <option value="Return">Return</option>
-                            <option value="Other">Other</option>
-                        </select>
-                        @error('reason')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                    <div class="row g-3 mt-0">
+                        <div class="col-md-6">
+                            <label class="form-label">Reason *</label>
+                            <select name="reason" required class="form-select @error('reason') is-invalid @enderror">
+                                <option value="">— Select —</option>
+                                <option value="Inventory Count" @if(old('reason')==='Inventory Count') selected @endif>Inventory Count</option>
+                                <option value="Damaged" @if(old('reason')==='Damaged') selected @endif>Damaged</option>
+                                <option value="Loss" @if(old('reason')==='Loss') selected @endif>Loss</option>
+                                <option value="System Error" @if(old('reason')==='System Error') selected @endif>System Error</option>
+                                <option value="Return" @if(old('reason')==='Return') selected @endif>Return</option>
+                                <option value="Other" @if(old('reason')==='Other') selected @endif>Other</option>
+                            </select>
+                            @error('reason')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference</label>
+                            <input type="text" name="reference" class="form-control" value="{{ old('reference') }}">
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
-                        <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">{{ old('notes') }}</textarea>
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Notes</label>
+                        <textarea name="notes" class="form-control" rows="3">{{ old('notes') }}</textarea>
                     </div>
 
-                    <div class="flex justify-end space-x-3">
-                        <a href="{{ route('movements.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700">Adjust Stock</button>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Batch number</label>
+                            <input type="text" name="batch_number" class="form-control" value="{{ old('batch_number') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reception Detail (not applicable)</label>
+                            <input type="number" name="stock_incoming_detail_id" class="form-control" value="" disabled>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-0">
+                        <div class="col-md-6">
+                            <label class="form-label">Usage Request (not applicable)</label>
+                            <input type="number" name="stock_item_usage_request_id" class="form-control" value="" disabled>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-3">
+                        <button class="btn btn-primary">Save Adjustment</button>
                     </div>
                 </form>
             </div>

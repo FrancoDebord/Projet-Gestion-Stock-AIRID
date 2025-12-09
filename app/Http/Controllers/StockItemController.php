@@ -103,6 +103,9 @@ class StockItemController extends Controller
             }
         }
 
+        //initial_quantity
+        $data['quantity'] = $data['initial_quantity'];
+
         StockItem::create($data);
 
         return redirect()->route('stock-items.index')
@@ -266,6 +269,9 @@ class StockItemController extends Controller
             }
         }
 
+           //initial_quantity
+        $data['quantity'] = $data['initial_quantity'];
+        
         $stockItem->update($data);
 
         return redirect()->route('stock-items.show', $stockItem)
