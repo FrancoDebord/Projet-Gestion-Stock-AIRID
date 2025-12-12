@@ -17,4 +17,9 @@ class Project extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
+
+    public function stockBalances()
+    {
+        return $this->hasMany(ProjectStockBalance::class);
+    }
 }

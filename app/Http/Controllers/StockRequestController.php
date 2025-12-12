@@ -8,6 +8,7 @@ use App\Models\StockItem;
 use App\Models\StockMovement;
 use App\Models\User;
 use App\Models\Project;
+use App\Services\ProjectStockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -276,6 +277,8 @@ class StockRequestController extends Controller
             // Create stock movements for each approved item
             foreach ($stockRequest->details as $detail) {
                 if ($detail->isApproved() && $detail->approved_quantity > 0) {
+                    $projectId = $detail->project_id ?? $stockRequest->project_id;
+
                     StockMovement::create([
                         'stock_item_id' => $detail->stock_item_id,
                         'user_id' => $stockRequest->requester_id,
@@ -284,9 +287,17 @@ class StockRequestController extends Controller
                         'reason' => 'Stock request fulfillment',
                         'notes' => "Request ID: {$stockRequest->id}, Reason: {$detail->request_reason}",
                         'reference' => "REQUEST-{$stockRequest->id}-{$detail->id}",
-                        'project_id' => $detail->project_id ?? $stockRequest->project_id,
+                        'project_id' => $projectId,
                         'purpose' => 'Stock request',
                     ]);
+
+                    // Update project stock balance
+                    ProjectStockService::updateBalance(
+                        $projectId,
+                        $detail->stock_item_id,
+                        $detail->approved_quantity,
+                        'out'
+                    );
                 }
             }
         });

@@ -63,6 +63,11 @@ class StockItem extends Model
         return $this->hasMany(StockIncomingRecordDetail::class, 'stock_item_id');
     }
 
+    public function stockBalances()
+    {
+        return $this->hasMany(ProjectStockBalance::class);
+    }
+
     public function getTotalValueAttribute()
     {
         return $this->initial_quantity * ($this->unit_price ?? 0);

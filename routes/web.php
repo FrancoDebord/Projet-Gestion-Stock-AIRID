@@ -52,6 +52,23 @@ Route::middleware('auth')->prefix('movements')->group(function () {
     Route::delete('/{movement}', [StockMovementController::class, 'destroy'])->name('movements.destroy');
 });
 
+// Project Stock Overview
+use App\Http\Controllers\ProjectStockController;
+
+Route::middleware('auth')->prefix('project-stocks')->group(function () {
+    Route::get('/', [ProjectStockController::class, 'index'])->name('project-stocks.index');
+    Route::get('/export', [ProjectStockController::class, 'export'])->name('project-stocks.export');
+});
+
+// Enhanced Stock Movement Routes
+Route::middleware('auth')->prefix('movements-fullfil')->group(function () {
+    // ... existing routes ...
+    Route::get('/fulfill-request', [StockMovementController::class, 'fulfillRequest'])->name('movements.fulfill-request');
+    Route::post('/fulfill-request/{stockRequest}', [StockMovementController::class, 'processFulfillment'])->name('movements.process-fulfillment');
+    Route::get('/process-reception', [StockMovementController::class, 'processReception'])->name('movements.process-reception');
+    Route::post('/process-reception/{stockIncomingRecord}', [StockMovementController::class, 'processReceptionMovements'])->name('movements.process-reception-movements');
+});
+
 // Shipments: administration reception and finalization
 use App\Http\Controllers\ShipmentController;
 

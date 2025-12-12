@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ProjectStockService;
 
 class StockReceptionController extends Controller
 {
@@ -91,18 +92,29 @@ class StockReceptionController extends Controller
 
             // Create stock movements for each received item
             foreach ($validated['details'] as $detail) {
+                $projectId = $validated['project_id'] ?? ProjectStockService::getGlobalProject()->id;
+
                 StockMovement::create([
                     'stock_item_id' => $detail['stock_item_id'],
                     'user_id' => $validated['receiver'], // User who received the stock
                     'type' => 'in',
+                    "date_mouvement" => now()->format('Y-m-d H:i:s'),
                     'quantity' => $detail['quantite_lot'],
                     'reason' => 'Stock reception from shipment',
                     'notes' => "Reception ID: {$record->id}, Code Lot: {$detail['code_lot']}" .
                               ($detail['batch_number'] ? ", Batch: {$detail['batch_number']}" : ''),
                     'reference' => "RECEPTION-{$record->id}-{$detail['code_lot']}",
-                    'project_id' => $validated['project_id'] ?? null,
+                    'project_id' => $projectId,
                     'purpose' => 'Stock reception',
                 ]);
+
+                // Update project stock balance
+                ProjectStockService::updateBalance(
+                    $projectId,
+                    $detail['stock_item_id'],
+                    $detail['quantite_lot'],
+                    'in'
+                );
             }
         });
 
@@ -193,6 +205,7 @@ class StockReceptionController extends Controller
                     'stock_item_id' => $detail['stock_item_id'],
                     'user_id' => $validated['receiver'], // User who received the stock
                     'type' => 'in',
+                    "date_mouvement" => now()->format('Y-m-d H:i:s'),
                     'quantity' => $detail['quantite_lot'],
                     'reason' => 'Stock reception from shipment (updated)',
                     'notes' => "Reception ID: {$stockReception->id}, Code Lot: {$detail['code_lot']}" .

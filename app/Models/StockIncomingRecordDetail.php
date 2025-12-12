@@ -24,4 +24,9 @@ class StockIncomingRecordDetail extends Model
     {
         return $this->belongsTo(StockIncomingRecord::class, 'stock_incoming_record_id');
     }
+
+    public function stockMovement()
+    {
+        return $this->belongsTo(StockMovement::class, 'stock_incoming_detail_id');
+    }
 }

@@ -6,6 +6,7 @@ use App\Models\StockRequest;
 use App\Models\StockItem;
 use App\Models\StockMovement;
 use App\Models\Project;
+use App\Services\ProjectStockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -56,13 +57,21 @@ class FacilityManagerController extends Controller
             // Get available quantities by project
             $availabilityByProject = $this->getAvailabilityByProject($stockItem->id);
 
+            // Check availability with Global + project logic
+            $availability = ProjectStockService::checkAvailability(
+                $stockItem->id,
+                $detail->project_id,
+                $detail->requested_quantity
+            );
+
             $itemsWithAvailability[] = [
                 'detail' => $detail,
                 'stock_item' => $stockItem,
                 'total_available' => $totalAvailable,
                 'availability_by_project' => $availabilityByProject,
                 'requested_quantity' => $detail->requested_quantity,
-                'can_fulfill' => $totalAvailable >= $detail->requested_quantity
+                'can_fulfill' => $availability['can_fulfill'],
+                'availability_info' => $availability,
             ];
         }
 
@@ -134,16 +143,7 @@ class FacilityManagerController extends Controller
      */
     private function getTotalAvailableQuantity($stockItemId)
     {
-        // Calculate total incoming - total outgoing
-        $totalIncoming = StockMovement::where('stock_item_id', $stockItemId)
-            ->where('type', 'in')
-            ->sum('quantity');
-
-        $totalOutgoing = StockMovement::where('stock_item_id', $stockItemId)
-            ->where('type', 'out')
-            ->sum('quantity');
-
-        return $totalIncoming - $totalOutgoing;
+        return ProjectStockService::getTotalAvailable($stockItemId);
     }
 
     /**
@@ -151,33 +151,13 @@ class FacilityManagerController extends Controller
      */
     private function getAvailabilityByProject($stockItemId)
     {
-        // Get all projects
-        $projects = Project::all();
-
-        $availabilityByProject = [];
-
-        foreach ($projects as $project) {
-            // Calculate available quantity for this project
-            $incoming = StockMovement::where('stock_item_id', $stockItemId)
-                ->where('project_id', $project->id)
-                ->where('type', 'in')
-                ->sum('quantity');
-
-            $outgoing = StockMovement::where('stock_item_id', $stockItemId)
-                ->where('project_id', $project->id)
-                ->where('type', 'out')
-                ->sum('quantity');
-
-            $available = $incoming - $outgoing;
-
-            if ($available > 0) {
-                $availabilityByProject[] = [
-                    'project' => $project,
-                    'available_quantity' => $available,
+        return ProjectStockService::getBalancesForStockItem($stockItemId)
+            ->map(function ($balance) {
+                return [
+                    'project' => $balance->project,
+                    'available_quantity' => $balance->balance,
                 ];
-            }
-        }
-
-        return $availabilityByProject;
+            })
+            ->toArray();
     }
 }

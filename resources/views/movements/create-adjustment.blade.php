@@ -13,15 +13,27 @@
                 <form action="{{ route('movements.store-adjustment') }}" method="POST">
                     @csrf
 
-                    <div class="mb-3">
-                        <label class="form-label">Stock Item *</label>
-                        <select name="stock_item_id" required class="form-select @error('stock_item_id') is-invalid @enderror">
-                            <option value="">— Select —</option>
-                            @foreach($stocks as $stock)
-                                <option value="{{ $stock->id }}" @if(old('stock_item_id') == $stock->id) selected @endif>{{ $stock->sku }} — {{ $stock->name }} (Current: {{ $stock->quantity }})</option>
-                            @endforeach
-                        </select>
-                        @error('stock_item_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Stock Item *</label>
+                            <select name="stock_item_id" required class="form-select @error('stock_item_id') is-invalid @enderror">
+                                <option value="">— Select —</option>
+                                @foreach($stocks as $stock)
+                                    <option value="{{ $stock->id }}" @if(old('stock_item_id') == $stock->id) selected @endif>{{ $stock->sku }} — {{ $stock->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('stock_item_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Project</label>
+                            <select name="project_id" class="form-select @error('project_id') is-invalid @enderror">
+                                <option value="">— Global (default) —</option>
+                                @foreach($projects as $project)
+                                    <option value="{{ $project->id }}" @if(old('project_id') == $project->id) selected @endif>{{ $project->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('project_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
                     </div>
 
                     <div class="row g-3">
